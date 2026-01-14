@@ -10,7 +10,7 @@ public class MainForm : Form
     private readonly Label _dateLabel;
     private readonly Label _tzLabel;
     private readonly Button _toggleButton;
-    private readonly Timer _timer;
+    private readonly System.Windows.Forms.Timer _timer;
 
     private bool _is24Hour = true;
 
@@ -87,7 +87,7 @@ public class MainForm : Form
         Controls.Add(_dateLabel);
         Controls.Add(_timeLabel);
 
-        _timer = new Timer { Interval = 1000 };
+        _timer = new System.Windows.Forms.Timer { Interval = 1000 };
         _timer.Tick += (_, _) => UpdateClock();
         _timer.Start();
 
