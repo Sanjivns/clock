@@ -1,4 +1,4 @@
-name: Build Android and Windows
+name: Android Build
 
 on:
   push:
@@ -33,32 +33,8 @@ jobs:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
-  build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
-
-      - name: Publish Windows app
-        run: dotnet publish windows/ClockDesktop/ClockDesktop.csproj -c Release -r win-x64 --self-contained false -o out
-
-      - name: Archive Windows app
-        run: Compress-Archive -Path out\* -DestinationPath ClockDesktop-win-x64.zip
-
-      - name: Upload Windows app archive
-        uses: actions/upload-artifact@v4
-        with:
-          name: clock-windows
-          path: ClockDesktop-win-x64.zip
-
   release:
-    needs: [build-android, build-windows]
+    needs: build-android
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
 
@@ -71,9 +47,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            artifacts/app-debug-apk/*.apk
-            artifacts/clock-windows/*.zip
+          files: artifacts/app-debug-apk/*.apk
         env:
-          GITHUB_TOKEN: ${{ secrets.HUB_TOKEN }}
-
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
