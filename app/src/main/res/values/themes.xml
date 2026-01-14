@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Use a core Android theme as the base; Compose handles the visual theme in code. -->
-    <style name="Theme.TimeClockApp" parent="Theme.Material.Light.NoActionBar">
-        <!-- No extra attributes needed here. -->
-    </style>
+    <!-- Use a core Android platform theme as the base; Compose handles the visual theme in code. -->
+    <style name="Theme.TimeClockApp" parent="@android:style/Theme.Material.Light.NoActionBar" />
 
 </resources>
-
 
