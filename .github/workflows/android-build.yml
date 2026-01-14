@@ -3,10 +3,9 @@ name: Build Android and Windows
 on:
   push:
     branches: [ main ]
-  pull_request:
-  push:
     tags:
       - "v*"
+  pull_request:
 
 jobs:
   build-android:
@@ -74,3 +73,4 @@ jobs:
             artifacts/clock-windows-exe/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
