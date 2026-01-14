@@ -72,5 +72,5 @@ jobs:
             artifacts/app-debug-apk/*.apk
             artifacts/clock-windows-exe/*.exe
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.HUB_TOKEN }}
 
