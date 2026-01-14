@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.TimeClockApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Compose theme is handled in code; this is just the app's base theme. -->
+    </style>
+
+</resources>
+
