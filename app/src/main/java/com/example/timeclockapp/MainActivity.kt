@@ -39,6 +39,21 @@ class MainActivity : ComponentActivity() {
 fun TimeScreen() {
     var is24Hour by remember { mutableStateOf(true) }
     var now by remember { mutableStateOf(Date()) }
+    val quotes = remember {
+        listOf(
+            "The best way to predict the future is to create it.",
+            "Time is what we want most, but what we use worst.",
+            "The bad news is time flies. The good news is you're the pilot.",
+            "Yesterday is gone. Tomorrow has not yet come. We have only today. Let us begin.",
+            "Lost time is never found again.",
+            "Time is money.",
+            "Better three hours too soon than a minute too late.",
+            "The present moment is filled with joy and happiness. If you are attentive, you will see it.",
+            "Time is a created thing. To say 'I don't have time,' is to say 'I don't want to.'",
+            "The greatest gift you can give someone is your time because when you give your time, you are giving a portion of your life that you will never get back."
+        )
+    }
+    var currentQuote by remember { mutableStateOf(quotes.random()) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -98,6 +113,16 @@ fun TimeScreen() {
             text = tzLabel,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.outline
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "\"${currentQuote}\"",
+            fontSize = 14.sp,
+            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
