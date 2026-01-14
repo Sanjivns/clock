@@ -28,7 +28,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TimeScreen()
+                ) {
+                    ClockApp()
                 }
             }
         }
@@ -36,9 +37,39 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TimeScreen() {
+fun ClockApp() {
+    var selectedTab by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Clock", "Stopwatch", "Timer")
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                tabs.forEachIndexed { index, title ->
+                    NavigationBarItem(
+                        icon = { },
+                        label = { Text(title) },
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            when (selectedTab) {
+                0 -> ClockScreen()
+                1 -> StopwatchScreen()
+                2 -> TimerScreen()
+            }
+        }
+    }
+}
+
+@Composable
+fun ClockScreen() {
     var is24Hour by remember { mutableStateOf(true) }
     var now by remember { mutableStateOf(Date()) }
+    // ... Copy existing quotes logic here if needed, but for brevity keeping it simple or reusing
     val quotes = remember {
         listOf(
             "The best way to predict the future is to create it.",
@@ -129,6 +160,173 @@ fun TimeScreen() {
 
         Button(onClick = { is24Hour = !is24Hour }) {
             Text(if (is24Hour) "Switch to 12-hour" else "Switch to 24-hour")
+        }
+    }
+}
+
+@Composable
+fun StopwatchScreen() {
+    var isRunning by remember { mutableStateOf(false) }
+    var startTime by remember { mutableLongStateOf(0L) }
+    var elapsedTime by remember { mutableLongStateOf(0L) }
+    var displayTime by remember { mutableLongStateOf(0L) }
+
+    LaunchedEffect(isRunning) {
+        if (isRunning) {
+            startTime = System.currentTimeMillis()
+            while (isRunning) {
+                displayTime = elapsedTime + (System.currentTimeMillis() - startTime)
+                delay(10) // Update every 10ms
+            }
+        }
+    }
+
+    // Format HH:MM:SS.ms
+    val ms = (displayTime % 1000) / 10
+    val totalSeconds = displayTime / 1000
+    val seconds = totalSeconds % 60
+    val minutes = (totalSeconds / 60) % 60
+    val hours = totalSeconds / 3600
+    
+    val formattedTime = String.format("%02d:%02d:%02d.%02d", hours, minutes, seconds, ms)
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Stopwatch", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(text = formattedTime, fontSize = 48.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = {
+                if (!isRunning) {
+                    isRunning = true
+                }
+            }, enabled = !isRunning) {
+                Text("Start")
+            }
+            Button(onClick = {
+                if (isRunning) {
+                    isRunning = false
+                    elapsedTime += System.currentTimeMillis() - startTime
+                }
+            }, enabled = isRunning) {
+                Text("Stop")
+            }
+            Button(onClick = {
+                isRunning = false
+                elapsedTime = 0L
+                displayTime = 0L
+            }) {
+                Text("Reset")
+            }
+        }
+    }
+}
+
+@Composable
+fun TimerScreen() {
+    var inputHours by remember { mutableStateOf("") }
+    var inputMinutes by remember { mutableStateOf("") }
+    var inputSeconds by remember { mutableStateOf("") }
+    
+    var remainingTime by remember { mutableLongStateOf(0L) }
+    var isRunning by remember { mutableStateOf(false) }
+    var isFinished by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isRunning) {
+        if (isRunning && remainingTime > 0) {
+            val endTime = System.currentTimeMillis() + remainingTime * 1000
+            while (isRunning && remainingTime > 0) {
+                 remainingTime = (endTime - System.currentTimeMillis()) / 1000
+                 if (remainingTime <= 0) {
+                     remainingTime = 0
+                     isRunning = false
+                     isFinished = true
+                 }
+                 delay(100)
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Timer", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(32.dp))
+
+        if (isRunning || remainingTime > 0 || isFinished) {
+            // CountDown Display
+             val hours = remainingTime / 3600
+             val minutes = (remainingTime % 3600) / 60
+             val seconds = remainingTime % 60
+             
+             Text(
+                 text = if(isFinished) "Time's up!" else String.format("%02d:%02d:%02d", hours, minutes, seconds),
+                 fontSize = 48.sp, 
+                 fontWeight = FontWeight.Bold,
+                 color = if (isFinished) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground
+             )
+             
+             Spacer(modifier = Modifier.height(32.dp))
+             
+             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                 if (!isFinished) {
+                     Button(onClick = { isRunning = !isRunning }) {
+                         Text(if (isRunning) "Pause" else "Resume")
+                     }
+                 }
+                 Button(onClick = {
+                     isRunning = false
+                     isFinished = false
+                     remainingTime = 0
+                 }) {
+                     Text("Reset")
+                 }
+             }
+        } else {
+            // Inputs
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = inputHours, 
+                    onValueChange = { if(it.all { c -> c.isDigit() }) inputHours = it },
+                    label = { Text("HH") },
+                    modifier = Modifier.width(70.dp),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = inputMinutes, 
+                    onValueChange = { if(it.all { c -> c.isDigit() }) inputMinutes = it },
+                    label = { Text("MM") },
+                    modifier = Modifier.width(70.dp),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = inputSeconds, 
+                    onValueChange = { if(it.all { c -> c.isDigit() }) inputSeconds = it },
+                    label = { Text("SS") },
+                     modifier = Modifier.width(70.dp),
+                     singleLine = true
+                )
+            }
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(onClick = {
+                val h = inputHours.toLongOrNull() ?: 0L
+                val m = inputMinutes.toLongOrNull() ?: 0L
+                val s = inputSeconds.toLongOrNull() ?: 0L
+                remainingTime = h * 3600 + m * 60 + s
+                if (remainingTime > 0) {
+                    isRunning = true
+                    isFinished = false
+                }
+            }) {
+                Text("Start")
+            }
         }
     }
 }

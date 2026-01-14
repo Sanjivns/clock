@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Current Time</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="app">
-      <div class="card">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Current Time</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <div class="card">
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="tab-clock">Clock</button>
+        <button class="tab-btn" data-tab="tab-stopwatch">Stopwatch</button>
+        <button class="tab-btn" data-tab="tab-timer">Timer</button>
+      </nav>
+
+      <div id="tab-clock" class="tab-content active">
         <h1 class="title">Current Time</h1>
         <div class="clock" id="clock">--:--:--</div>
         <div class="date" id="date">Loading date…</div>
@@ -17,9 +26,35 @@
           <button class="btn-toggle" id="formatToggle">Switch to 12-hour</button>
         </div>
       </div>
+
+      <div id="tab-stopwatch" class="tab-content">
+        <h1 class="title">Stopwatch</h1>
+        <div class="clock" id="sw-display">00:00:00.00</div>
+        <div class="controls">
+          <button class="btn-toggle" id="sw-start">Start</button>
+          <button class="btn-toggle" id="sw-stop" disabled>Stop</button>
+          <button class="btn-toggle" id="sw-reset">Reset</button>
+        </div>
+      </div>
+
+      <div id="tab-timer" class="tab-content">
+        <h1 class="title">Timer</h1>
+        <div class="timer-inputs" id="timer-inputs">
+          <input type="number" id="tm-hours" placeholder="HH" min="0" max="99">
+          <input type="number" id="tm-minutes" placeholder="MM" min="0" max="59">
+          <input type="number" id="tm-seconds" placeholder="SS" min="0" max="59">
+        </div>
+        <div class="clock" id="tm-display" style="display:none;">00:00:00</div>
+        <div class="controls">
+          <button class="btn-toggle" id="tm-start">Start</button>
+          <button class="btn-toggle" id="tm-pause" style="display:none;">Pause</button>
+          <button class="btn-toggle" id="tm-reset">Reset</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
-  </html>
+  <script src="script.js"></script>
+</body>
 
+</html>
