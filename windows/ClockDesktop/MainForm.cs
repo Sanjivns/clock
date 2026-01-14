@@ -20,6 +20,7 @@ public class MainForm : Form
         StartPosition = FormStartPosition.CenterScreen;
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
+        Icon = new Icon("clock.ico");
         ClientSize = new Size(420, 220);
 
         BackColor = Color.FromArgb(2, 6, 23); // dark background
