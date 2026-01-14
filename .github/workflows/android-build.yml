@@ -1,12 +1,15 @@
-name: Android Build
+name: Build Android and Windows
 
 on:
   push:
     branches: [ main ]
   pull_request:
+  push:
+    tags:
+      - "v*"
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,3 +34,43 @@ jobs:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish Windows app
+        run: dotnet publish windows/ClockDesktop/ClockDesktop.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o out
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: clock-windows-exe
+          path: out/*.exe
+
+  release:
+    needs: [build-android, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/app-debug-apk/*.apk
+            artifacts/clock-windows-exe/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
